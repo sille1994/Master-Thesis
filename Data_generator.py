@@ -94,15 +94,12 @@ def pars_data(filepath, width=512):
             continue
     
     # Create a place to store the batches of the signals and the labels
-    data = np.zeros((width,))
-    data = np.append([data], [data], axis=0)
-
-    labels = np.zeros((width,))
-    labels = np.append([labels], [labels], axis=0)
+    data = []
+    labels = []
 
     
     for filename in filenames_signal:
-        print(filename)
+        #print(filename)
         
         # Load the signals and the labels
         signal = np.load(str(filepath + '/' + filename))
@@ -120,11 +117,17 @@ def pars_data(filepath, width=512):
             for i in range((number*2+1)):
                 batch_signal = signal[int(width/2)*i:int(width/2)*(i+2),]
                 batch_label = label[int(width/2)*i:int(width/2)*(i+2),]
-           
-                data = np.append(data, [batch_signal], axis=0)
-                labels = np.append(labels, [batch_label], axis=0)
+                   
+                # Add 1 to get over zero and multiply with 4000 to make it possible to get int 
+                batch_signal = ((batch_signal+1)*4000)
+                batch_signal = batch_signal.astype(int)
+                
+                batch_label = batch_label.astype(int)
 
-                print(int(width/2)*i,int(width/2)*(i+2))
+                data.append(batch_signal)
+                labels.append(batch_label)
+
+                #print(int(width/2)*i,int(width/2)*(i+2))
 
         else:
             # Take the batches of the signals if the width devided with the signal is not a whole number
@@ -133,15 +136,21 @@ def pars_data(filepath, width=512):
                 batch_signal = signal[int(width/2)*i:int(width/2)*(i+2),]
                 batch_label = label[int(width/2)*i:int(width/2)*(i+2),]
                    
-                print(int(width/2)*i,int(width/2)*(i+2))
+                #print(int(width/2)*i,int(width/2)*(i+2))
 
-                data = np.append(data, [batch_signal], axis=0)
-                labels = np.append(labels, [batch_label], axis=0)
+                # Add 1 to get over zero and multiply with 4000 to make it possible to get int 
+                batch_signal = ((batch_signal+1)*4000)
+                batch_signal = batch_signal.astype(int)
+                
+                batch_label = batch_label.astype(int)
+
+                data.append(batch_signal)
+                labels.append(batch_label)
     
     # Delete the first two rows of zeros
-    data = data[2:,:]
-    labels = labels[2:,:]
-    print(data.shape, labels.shape)
+    data = data[1:]
+    labels = labels[1:]
+
     return data, labels
     
     
@@ -181,7 +190,7 @@ filepath_test = './Data/Test'
 Dataset = read_data_sets(filepath_train, filepath_valid, filepath_test)
 
 y_train = Dataset.train.signal
-y_train
+#print(y_train)
 
 
 
